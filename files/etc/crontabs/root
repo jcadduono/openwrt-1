@@ -1,0 +1,2 @@
+# Compact zram every 12 hours
+0 */12 * * * /bin/zram compact
