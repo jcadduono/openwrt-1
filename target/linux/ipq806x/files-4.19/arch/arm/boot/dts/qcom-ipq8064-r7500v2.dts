@@ -6,6 +6,14 @@
 	model = "Netgear Nighthawk X4 R7500v2";
 	compatible = "netgear,r7500v2";
 
+	cpus {
+		idle-states {
+			CPU_SPC: spc {
+				status = "okay";
+			};
+		};
+	};
+	
 	memory@0 {
 		reg = <0x42000000 0x1e000000>;
 		device_type = "memory";
