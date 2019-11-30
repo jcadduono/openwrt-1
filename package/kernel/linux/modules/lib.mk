@@ -166,6 +166,27 @@ endef
 $(eval $(call KernelPackage,lib-lz4))
 
 
+define KernelPackage/lib-lz4hc
+  SUBMENU:=$(LIB_MENU)
+  TITLE:=LZ4HC support
+  DEPENDS:=+kmod-lib-lz4 +!LINUX_4_9:kmod-crypto-acompress
+  HIDDEN:=1
+  KCONFIG:= \
+	CONFIG_CRYPTO_LZ4HC@ge4.9 \
+	CONFIG_LZ4HC_COMPRESS
+  FILES:= \
+	$(LINUX_DIR)/crypto/lz4hc.ko@ge4.9 \
+	$(LINUX_DIR)/lib/lz4/lz4hc_compress.ko
+  AUTOLOAD:=$(call AutoProbe,lz4hc@ge4.9 lz4hc_compress)
+endef
+
+define KernelPackage/lib-lz4hc/description
+ Kernel module for LZ4HC compression/decompression support
+endef
+
+$(eval $(call KernelPackage,lib-lz4hc))
+
+
 define KernelPackage/lib-raid6
   SUBMENU:=$(LIB_MENU)
   TITLE:=RAID6 algorithm support
