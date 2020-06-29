@@ -1,0 +1,33 @@
+#!/bin/sh
+
+add_overlay() {
+	echo "found gpt overlay $1: $2"
+	/sbin/uci -q delete fstab.overlay
+	/sbin/uci set fstab.overlay="mount"
+	/sbin/uci set fstab.overlay.$1="$2"
+	/sbin/uci set fstab.overlay.target="/overlay"
+	/sbin/uci commit fstab
+}
+
+find_overlay() {
+	echo "- find gpt overlay by rootfs_data partlabel -"
+	if [ ! -x /usr/sbin/blkid ]; then
+		echo "blkid is missing or not executable, skipping"
+	fi
+	local uuid device
+	uuid=$(/usr/sbin/blkid -l -s UUID -o value -t PARTLABEL="rootfs_data")
+	if [ -n "$uuid" ]; then
+		add_overlay uuid "$uuid"
+		return 0
+	fi
+	# if partition is unformatted then temporarily add it by device name
+	device=$(/usr/sbin/blkid -l -o device -t PARTLABEL="rootfs_data")
+	if [ -b "$device" ]; then
+		add_overlay device "$device"
+		return 0
+	fi
+	echo "failed to find gpt overlay"
+	return 1
+}
+
+boot_hook_add preinit_main find_overlay
